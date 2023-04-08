@@ -1,5 +1,6 @@
 
 import json
+import time
 import attr
 from larksuiteoapi.service.im.v1.event import MessageReceiveEvent
 from larksuiteoapi import Config, Context
@@ -12,9 +13,11 @@ from feishu.feishu_conf import feishu_conf
 from util.duplicate_filter import event_is_processed, mark_event_processed
 from util.logger import feishu_message_logger, app_logger
 
-message_handler = MyMessageEventHandler(app_config,feishu_conf)
-command_handler = CommandHandler(app_config,feishu_conf)
-def route_im_message(ctx:Context, conf:Config, event: MessageReceiveEvent) -> Any:
+message_handler = MyMessageEventHandler(app_config, feishu_conf)
+command_handler = CommandHandler(app_config, feishu_conf)
+
+
+def route_im_message(ctx: Context, conf: Config, event: MessageReceiveEvent) -> Any:
     # ignore request if sender_type is not user
     if event.event.sender.sender_type != "user":
         return
@@ -26,7 +29,12 @@ def route_im_message(ctx:Context, conf:Config, event: MessageReceiveEvent) -> An
     json_content = json.loads(event.event.message.content)
 
     if event_is_processed(event):
-        app_logger.debug("Skip already processed: %s", attr.asdict(event.event))
+        app_logger.debug("Skip already processed: %s",
+                         attr.asdict(event.event))
+        return
+    if event.event.message.create_time < (time.time() * 1000 - 10 * 60 * 1000):
+        # ignore event if event is 10 minutes old
+        app_logger.debug("Skip old event: %s", attr.asdict(event.event))
         return
 
     if "text" in json_content and json_content["text"].startswith("/"):
