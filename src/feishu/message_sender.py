@@ -1,12 +1,11 @@
 import json
 import time
 import attr
-import attrs
 from larksuiteoapi.api import Request, set_timeout
 from larksuiteoapi import Config, ACCESS_TOKEN_TYPE_TENANT, DOMAIN_FEISHU, LEVEL_DEBUG
 from util.app_config import app_config
 from store.chat_history import ChatEvent, append_chat_event
-
+from util.logger import app_logger
 
 
 @attr.s
@@ -29,7 +28,14 @@ class MessageSender:
         }
         req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
                     output_class=Message, request_opts=[set_timeout(3)])
-        req.do(self.conf)
+        resp = req.do(self.conf)
+        app_logger.info("send_text_message_no_append:%s",msg)
+        if resp.code == 0:
+            return True
+        else:
+            app_logger.info(resp.msg)
+            app_logger.info(resp.error)
+            return False
 
     def send_text_message(self,user_id,msg):
         body = {
@@ -42,7 +48,7 @@ class MessageSender:
         req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
                     output_class=Message, request_opts=[set_timeout(3)])
         resp = req.do(self.conf)
-
+        app_logger.info("send_text_message:%s",msg)
         if resp.code == 0:
             # store the message in the chat history
             new_chat_event = ChatEvent(**{
@@ -56,9 +62,11 @@ class MessageSender:
                 "create_time": int(time.time() * 1000)
             })
             append_chat_event(new_chat_event)
+            return True
         else:
-            print(resp.msg)
-            print(resp.error)
+            app_logger.info(resp.msg)
+            app_logger.info(resp.error)
+            return False
 
     def test_send_message_complex(self):
         body = {
@@ -113,14 +121,14 @@ class MessageSender:
         req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
                     output_class=Message, request_opts=[set_timeout(3)])
         resp = req.do(conf)
-        print('header = %s' % resp.get_header().items())
-        print('request id = %s' % resp.get_request_id())
-        print(resp)
+        app_logger.info('header = %s' % resp.get_header().items())
+        app_logger.info('request id = %s' % resp.get_request_id())
+        app_logger.info(resp)
         if resp.code == 0:
-            print(resp.data.message_id)
+            app_logger.info(resp.data.message_id)
         else:
-            print(resp.msg)
-            print(resp.error)
+            app_logger.info(resp.msg)
+            app_logger.info(resp.error)
 
 if __name__ == '__main__':
     app_config.validate()

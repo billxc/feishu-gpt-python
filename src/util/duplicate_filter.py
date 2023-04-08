@@ -28,6 +28,12 @@ def is_processed(id):
     if id in records:
         return True
 
+def event_is_processed(event):
+    return is_processed(event.event.message.message_id)
+
+def mark_event_processed(event):
+    set_processed(event.event.message.message_id)
+
 def set_processed(id):
     init_db()
     conn = sqlite3.connect(DB_PATH)

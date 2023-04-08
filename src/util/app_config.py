@@ -24,6 +24,7 @@ class AppConfig:
     HTTP_PORT: int
     API_URL: str
     HTTP_PROXY: str
+    DEFAULT_PROMPT: str
     
     @classmethod
     def from_dict(cls, env):      
@@ -57,6 +58,8 @@ class AppConfig:
             raise Exception('HTTP_PORT is required')
         if not self.API_URL:
             raise Exception('API_URL is required')
+        if not self.DEFAULT_PROMPT:
+            raise Exception('DEFAULT_PROMPT is required')
 
 def load_config():
     with open('config.yml', 'r',encoding='utf-8') as f:

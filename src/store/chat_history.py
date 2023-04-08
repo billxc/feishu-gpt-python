@@ -1,6 +1,7 @@
 import os
 import sqlite3
 from attr import dataclass
+from util.logger import app_logger
 
 CHAT_HISTORY_DB_FILE = 'data/chat_history.db'
 
@@ -63,9 +64,9 @@ def get_all_chat_events():
     rows = c.fetchall()
     conn.close()
     for row in rows:
-        print(row)
+        app_logger.info(row)
 
 if __name__ == '__main__':
     get_all_chat_events()
-    # print(get_chat_context_by_user_id("ab1cd2ef"))
+    # app_logger.info(get_chat_context_by_user_id("ab1cd2ef"))
 
