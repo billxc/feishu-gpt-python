@@ -29,25 +29,7 @@ class MessageSender:
         }
         req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
                     output_class=Message, request_opts=[set_timeout(3)])
-        resp = req.do(self.conf)
-
-        if resp.code == 0:
-            # store the message in the chat history
-            new_chat_event = ChatEvent(**{
-                "user_id": user_id,
-                "chat_id": "",
-                "chat_type": "",
-                "message_id": resp.data.message_id,
-                "message_type": "",
-                "content": json.dumps({"text": msg}),
-                "sender_user_id": "assistant",
-                "create_time": int(time.time())
-            })
-            print(attrs.asdict(new_chat_event))
-            print(resp.data.message_id)
-        else:
-            print(resp.msg)
-            print(resp.error)
+        req.do(self.conf)
 
     def send_text_message(self,user_id,msg):
         body = {
@@ -71,11 +53,9 @@ class MessageSender:
                 "message_type": "",
                 "content": json.dumps({"text": msg}),
                 "sender_user_id": "assistant",
-                "create_time": int(time.time())
+                "create_time": int(time.time() * 1000)
             })
-            print(attrs.asdict(new_chat_event))
             append_chat_event(new_chat_event)
-            print(resp.data.message_id)
         else:
             print(resp.msg)
             print(resp.error)
