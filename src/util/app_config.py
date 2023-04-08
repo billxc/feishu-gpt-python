@@ -25,7 +25,9 @@ class AppConfig:
     API_URL: str
     HTTP_PROXY: str
     DEFAULT_PROMPT: str
-    
+    PROMPT_DESCRIPTION_LIST: list
+    PROMPT_VALUE_LIST: list
+
     @classmethod
     def from_dict(cls, env):      
         return cls(**{
@@ -60,6 +62,10 @@ class AppConfig:
             raise Exception('API_URL is required')
         if not self.DEFAULT_PROMPT:
             raise Exception('DEFAULT_PROMPT is required')
+
+        # PROMPT_DESCRIPTION_LIST and PROMPT_VALUE_LIST must have the same length
+        if len(self.PROMPT_DESCRIPTION_LIST) != len(self.PROMPT_VALUE_LIST):
+            raise Exception('PROMPT_DESCRIPTION_LIST and PROMPT_VALUE_LIST must have the same length')
 
 def load_config():
     with open('config.yml', 'r',encoding='utf-8') as f:

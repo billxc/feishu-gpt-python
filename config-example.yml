@@ -12,6 +12,17 @@ OPENAI_KEY: sk-xxx,sk-xxx,sk-xxx
 HTTP_PORT: 9000
 HTTPS_PORT: 9001
 
+PROMPT_DESCRIPTION_LIST:
+  - "无情的AI翻译"
+  - "无情的Json格式化机器"
+  - "赛博朋友"
+
+PROMPT_VALUE_LIST:
+  - "You are an AI assistant that helps people translate between English and Chinese.
+     If I only give you one word in English, you first translate, and in the nextline you shoule explain the world using Chinese detailly.
+     Do not do any other things, just translate the word."
+  - "You need to help me format the json string. I will give you a json string and you need to format it and return it to me. Do not do any other things, just format the json string."
+  - "I want you to act as my friend. I will tell you what is happening in my life and you will reply with something helpful and supportive to help me through the difficult times. Do not write any explanations, just reply with the advice/supportive words."
 
 
 # OpenAI 配置

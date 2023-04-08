@@ -2,11 +2,11 @@ import json
 import time
 import attr
 from larksuiteoapi.api import Request, set_timeout
-from larksuiteoapi import Config, ACCESS_TOKEN_TYPE_TENANT, DOMAIN_FEISHU, LEVEL_DEBUG
+from larksuiteoapi import Config, ACCESS_TOKEN_TYPE_TENANT, DOMAIN_FEISHU
 from util.app_config import app_config
 from store.chat_history import ChatEvent, append_chat_event
 from util.logger import app_logger
-
+from feishu.command_card import COMMAND_CARD
 
 @attr.s
 class Message(object):
@@ -55,30 +55,7 @@ class MessageSender:
         body = {
             "user_id": user_id,
             "msg_type": "interactive",
-            "card":
-            {
-                "config": {
-                    "wide_screen_mode": True
-                },
-                "elements": [
-                    {
-                        "tag": "action",
-                        "actions": [
-                            {
-                                "tag": "button",
-                                "text": {
-                                    "tag": "plain_text",
-                                    "content": "清空对话"
-                                },
-                                "type": "primary",
-                                "value": {
-                                        "action": "newchat"
-                                }
-                            }
-                        ]
-                    }
-                ]
-            }
+            "card": COMMAND_CARD
         }
         req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
                       output_class=Message, request_opts=[set_timeout(3)])
@@ -157,7 +134,7 @@ class MessageSender:
 if __name__ == '__main__':
     app_config.validate()
     app_settings = Config.new_internal_app_settings_from_env()
-    conf = Config(DOMAIN_FEISHU, app_settings, log_level=LEVEL_DEBUG)
+    conf = Config(DOMAIN_FEISHU, app_settings)
     message_sender = MessageSender(conf)
     message_sender.test_send_message_complex()
     message_sender.send_text_message("ab1cd2ef", "Hello World")
