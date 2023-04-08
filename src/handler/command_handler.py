@@ -15,9 +15,19 @@ class CommandHandler:
         self.conf = conf
         self.message_sender = MessageSender(self.conf)
 
+    def handle_botmessage(self, body):
+        user_id = body["user_id"]
+        action_value = body["action"]["value"]
+
+        # {"action": "newchat"}
+        if "action" in action_value and action_value["action"] == "newchat":
+            app_logger.info("new chat")
+            clean_chat(user_id)
+            self.message_sender.send_text_message(user_id, "New chat started", append=False)
+        
+
     def handle_message(self, event):
         json_content = json.loads(event.event.message.content)
-
         if "text" in json_content and json_content["text"].startswith("/"):
             command = json_content["text"][1:]
             if command == "new":
@@ -26,5 +36,6 @@ class CommandHandler:
                 self.message_sender.send_text_message(event.event.sender.sender_id.user_id,"New chat started", append=False)
             else:
                 app_logger.info("unknown command")
-                self.message_sender.send_text_message(event.event.sender.sender_id.user_id, "Unknown command", append=False)
+                # self.message_sender.send_text_message(event.event.sender.sender_id.user_id, "Unknown command", append=False)
+                self.message_sender.send_command_card(event.event.sender.sender_id.user_id)
             return True

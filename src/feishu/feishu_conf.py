@@ -1,5 +1,5 @@
 import os
-from larksuiteoapi import Config, DOMAIN_FEISHU, LEVEL_DEBUG
+from larksuiteoapi import Config, DOMAIN_FEISHU, LEVEL_INFO, LEVEL_DEBUG
 from util.app_config import app_config
 
 os.environ['APP_ID'] = app_config.APP_ID
@@ -11,7 +11,7 @@ os.environ['BOT_NAME'] = app_config.BOT_NAME
 # for Cutome APP（企业自建应用）
 app_settings = Config.new_internal_app_settings_from_env()
 # for memory store and logger(level=debug)
-feishu_conf = Config(DOMAIN_FEISHU, app_settings, log_level=LEVEL_DEBUG)
+feishu_conf = Config(DOMAIN_FEISHU, app_settings, log_level=LEVEL_INFO)
 
 
 

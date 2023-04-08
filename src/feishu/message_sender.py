@@ -10,7 +10,8 @@ from util.logger import app_logger
 
 @attr.s
 class Message(object):
-    message_id = attr.ib(type=str) # type: ignore
+    message_id = attr.ib(type=str)  # type: ignore
+
 
 class MessageSender:
     def __init__(self, conf: Config):
@@ -18,25 +19,7 @@ class MessageSender:
             raise Exception("conf is required")
         self.conf = conf
 
-    # def send_text_message_no_append(self,user_id,msg):
-    #     body = {
-    #         "user_id": user_id,
-    #         "msg_type": "text",
-    #         "content": {
-    #             "text": msg
-    #         }
-    #     }
-    #     req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
-    #                 output_class=Message, request_opts=[set_timeout(3)])
-    #     resp = req.do(self.conf)
-    #     app_logger.debug("send_text_message_no_append:%s",msg)
-    #     if resp.code == 0:
-    #         return True
-    #     else:
-    #         app_logger.error("send message failed, code:%s, msg:%s, error:%s", resp.code, resp.msg, resp.error)
-    #         return False
-
-    def send_text_message(self,user_id,msg,append=True):
+    def send_text_message(self, user_id, msg, append=True):
         body = {
             "user_id": user_id,
             "msg_type": "text",
@@ -45,9 +28,9 @@ class MessageSender:
             }
         }
         req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
-                    output_class=Message, request_opts=[set_timeout(3)])
+                      output_class=Message, request_opts=[set_timeout(3)])
         resp = req.do(self.conf)
-        app_logger.debug("send_text_message:%s",msg)
+        app_logger.debug("send_text_message:%s", msg)
         if resp.code == 0:
             # store the message in the chat history
             if append:
@@ -64,7 +47,48 @@ class MessageSender:
                 append_chat_event(new_chat_event)
             return True
         else:
-            app_logger.error("send message failed, code:%s, msg:%s, error:%s", resp.code, resp.msg, resp.error)
+            app_logger.error(
+                "send message failed, code:%s, msg:%s, error:%s", resp.code, resp.msg, resp.error)
+            return False
+
+    def send_command_card(self, user_id):
+        body = {
+            "user_id": user_id,
+            "msg_type": "interactive",
+            "card":
+            {
+                "config": {
+                    "wide_screen_mode": True
+                },
+                "elements": [
+                    {
+                        "tag": "action",
+                        "actions": [
+                            {
+                                "tag": "button",
+                                "text": {
+                                    "tag": "plain_text",
+                                    "content": "清空对话"
+                                },
+                                "type": "primary",
+                                "value": {
+                                        "action": "newchat"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+        req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
+                      output_class=Message, request_opts=[set_timeout(3)])
+        resp = req.do(self.conf)
+        app_logger.debug("send_command_card to %s", user_id)
+        if resp.code == 0:
+            return True
+        else:
+            app_logger.error(
+                "send message failed, code:%s, msg:%s, error:%s", resp.code, resp.msg, resp.error)
             return False
 
     def test_send_message_complex(self):
@@ -118,7 +142,7 @@ class MessageSender:
         }
 
         req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
-                    output_class=Message, request_opts=[set_timeout(3)])
+                      output_class=Message, request_opts=[set_timeout(3)])
         resp = req.do(conf)
         app_logger.info('header = %s' % resp.get_header().items())
         app_logger.info('request id = %s' % resp.get_request_id())
@@ -129,10 +153,11 @@ class MessageSender:
             app_logger.info(resp.msg)
             app_logger.info(resp.error)
 
+
 if __name__ == '__main__':
     app_config.validate()
     app_settings = Config.new_internal_app_settings_from_env()
     conf = Config(DOMAIN_FEISHU, app_settings, log_level=LEVEL_DEBUG)
     message_sender = MessageSender(conf)
     message_sender.test_send_message_complex()
-    message_sender.send_text_message("ab1cd2ef","Hello World")
+    message_sender.send_text_message("ab1cd2ef", "Hello World")
