@@ -1,5 +1,5 @@
 import os
-from larksuiteoapi import Config, DOMAIN_FEISHU, LEVEL_INFO, LEVEL_DEBUG
+from larksuiteoapi import Config, DOMAIN_FEISHU, LEVEL_INFO
 from util.app_config import app_config
 
 os.environ['APP_ID'] = app_config.APP_ID

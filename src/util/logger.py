@@ -8,10 +8,6 @@ if not os.path.exists("logs"):
 CONSOLE_LOGGING_FORMAT = '%(asctime)s %(levelname)s %(message)s'
 FILE_LOGGING_FORMAT = '%(asctime)s %(levelname)s %(pathname)s:%(lineno)d %(message)s'
 
-logging.basicConfig(
-    format=CONSOLE_LOGGING_FORMAT,
-    level=logging.INFO
-)
 
 def get_logger(name):
     logger = logging.getLogger(name)
