@@ -22,7 +22,7 @@ def route_bot_message(body):
         return
     if "user_id" not in body:
         return
-    if "open_message_id" not in body:
+    if "token" not in body:
         return
     if bot_event_is_processed(body):
         app_logger.debug("Skip already processed: %s", body)

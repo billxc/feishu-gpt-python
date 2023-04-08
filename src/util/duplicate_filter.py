@@ -57,7 +57,7 @@ def event_is_processed(event):
 
 
 def bot_event_is_processed(event):
-    return is_processed(event["open_message_id"])
+    return is_processed(event["token"])
 
 def mark_processed(id):
     conn = sqlite3.connect(DB_PATH)
@@ -71,7 +71,7 @@ def mark_processed(id):
 
 
 def mark_bot_event_processed(event):
-    mark_processed(event["open_message_id"])
+    mark_processed(event["token"])
 
 
 def mark_event_processed(event):
