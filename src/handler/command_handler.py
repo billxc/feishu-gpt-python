@@ -23,8 +23,8 @@ class CommandHandler:
             if command == "new":
                 app_logger.info("new chat")
                 clean_chat(event.event.sender.sender_id.user_id)
-                self.message_sender.send_text_message_no_append(event.event.sender.sender_id.user_id,"New chat started")
+                self.message_sender.send_text_message(event.event.sender.sender_id.user_id,"New chat started", append=False)
             else:
                 app_logger.info("unknown command")
-                self.message_sender.send_text_message_no_append(event.event.sender.sender_id.user_id, "Unknown command")
+                self.message_sender.send_text_message(event.event.sender.sender_id.user_id, "Unknown command", append=False)
             return True

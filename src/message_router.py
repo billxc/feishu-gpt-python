@@ -26,7 +26,7 @@ def route_im_message(ctx:Context, conf:Config, event: MessageReceiveEvent) -> An
     json_content = json.loads(event.event.message.content)
 
     if event_is_processed(event):
-        app_logger.info("Skip already processed: %s", attr.asdict(event.event))
+        app_logger.debug("Skip already processed: %s", attr.asdict(event.event))
         return
 
     if "text" in json_content and json_content["text"].startswith("/"):

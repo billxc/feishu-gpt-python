@@ -26,9 +26,7 @@ class MyMessageEventHandler:
         self.app_config = app_config
         self.message_sender = MessageSender(self.conf)
 
-
     def handle_message(self, chat_event: ChatEvent):
-        app_logger.info(chat_event)
         content = json.loads(chat_event.content)
         # check if the message is already handled
         if "text" in content:
@@ -36,7 +34,7 @@ class MyMessageEventHandler:
             db_history = get_chat_context_by_user_id(chat_event.user_id)
             if len(db_history) == 0:
                 return self.message_sender.send_text_message(
-                    chat_event.sender_user_id, get_single_response(content["text"]))
+                    chat_event.sender_user_id, get_chat_response([{"role": "user", "content": content["text"]}]))
             else:
                 gpt_history = [{"role": "assistant", "content": get_text_message(x)} if x.sender_user_id == "assistant" else {
                     "role": "user", "content": get_text_message(x)} for x in db_history]

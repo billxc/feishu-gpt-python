@@ -18,26 +18,25 @@ class MessageSender:
             raise Exception("conf is required")
         self.conf = conf
 
-    def send_text_message_no_append(self,user_id,msg):
-        body = {
-            "user_id": user_id,
-            "msg_type": "text",
-            "content": {
-                "text": msg
-            }
-        }
-        req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
-                    output_class=Message, request_opts=[set_timeout(3)])
-        resp = req.do(self.conf)
-        app_logger.info("send_text_message_no_append:%s",msg)
-        if resp.code == 0:
-            return True
-        else:
-            app_logger.info(resp.msg)
-            app_logger.info(resp.error)
-            return False
+    # def send_text_message_no_append(self,user_id,msg):
+    #     body = {
+    #         "user_id": user_id,
+    #         "msg_type": "text",
+    #         "content": {
+    #             "text": msg
+    #         }
+    #     }
+    #     req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
+    #                 output_class=Message, request_opts=[set_timeout(3)])
+    #     resp = req.do(self.conf)
+    #     app_logger.debug("send_text_message_no_append:%s",msg)
+    #     if resp.code == 0:
+    #         return True
+    #     else:
+    #         app_logger.error("send message failed, code:%s, msg:%s, error:%s", resp.code, resp.msg, resp.error)
+    #         return False
 
-    def send_text_message(self,user_id,msg):
+    def send_text_message(self,user_id,msg,append=True):
         body = {
             "user_id": user_id,
             "msg_type": "text",
@@ -48,24 +47,24 @@ class MessageSender:
         req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
                     output_class=Message, request_opts=[set_timeout(3)])
         resp = req.do(self.conf)
-        app_logger.info("send_text_message:%s",msg)
+        app_logger.debug("send_text_message:%s",msg)
         if resp.code == 0:
             # store the message in the chat history
-            new_chat_event = ChatEvent(**{
-                "user_id": user_id,
-                "chat_id": "",
-                "chat_type": "",
-                "message_id": resp.data.message_id,
-                "message_type": "",
-                "content": json.dumps({"text": msg}),
-                "sender_user_id": "assistant",
-                "create_time": int(time.time() * 1000)
-            })
-            append_chat_event(new_chat_event)
+            if append:
+                new_chat_event = ChatEvent(**{
+                    "user_id": user_id,
+                    "chat_id": "",
+                    "chat_type": "",
+                    "message_id": resp.data.message_id,
+                    "message_type": "",
+                    "content": json.dumps({"text": msg}),
+                    "sender_user_id": "assistant",
+                    "create_time": int(time.time() * 1000)
+                })
+                append_chat_event(new_chat_event)
             return True
         else:
-            app_logger.info(resp.msg)
-            app_logger.info(resp.error)
+            app_logger.error("send message failed, code:%s, msg:%s, error:%s", resp.code, resp.msg, resp.error)
             return False
 
     def test_send_message_complex(self):
