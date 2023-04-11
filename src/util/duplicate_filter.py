@@ -60,6 +60,7 @@ def bot_event_is_processed(event):
     return is_processed(event["token"])
 
 def mark_processed(id):
+    processed_map[id] = True
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     # insert value with id and current timestamp
@@ -67,8 +68,15 @@ def mark_processed(id):
     c.execute("INSERT INTO records VALUES (?, ?)", (id, now))
     conn.commit()
     conn.close()
-    processed_map[id] = True
 
+def unmark_processed(id):
+    processed_map.pop(id)
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    # delete value with id
+    c.execute("DELETE FROM records WHERE id = ?", (id,))
+    conn.commit()
+    conn.close()
 
 def mark_bot_event_processed(event):
     mark_processed(event["token"])
@@ -76,3 +84,6 @@ def mark_bot_event_processed(event):
 
 def mark_event_processed(event):
     mark_processed(event.event.message.message_id)
+
+def unmark_event_processed(event):
+    unmark_processed(event.event.message.message_id)

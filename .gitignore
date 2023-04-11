@@ -3,3 +3,4 @@ data/
 __pycache__/
 logs/
 config.yml
+.DS_Store
