@@ -52,6 +52,8 @@ class CommandHandler:
                     user_prompt.delete_prompt(event.event.sender.sender_id.user_id)
                 else:
                     user_prompt.write_prompt(event.event.sender.sender_id.user_id, prompt)
+                clean_chat(event.event.sender.sender_id.user_id)
+                self.message_sender.send_text_message(event.event.sender.sender_id.user_id,"Prompt is set", append=False)
             else:
                 app_logger.info("unknown command")
                 # self.message_sender.send_text_message(event.event.sender.sender_id.user_id, "Unknown command", append=False)
